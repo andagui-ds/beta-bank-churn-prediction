@@ -1,0 +1,79 @@
+---
+title: "Predicción de Abandono de Clientes — Beta Bank"
+subtitle: "Un modelo de clasificación para retener clientes antes de que se marchen"
+format:
+  html:
+    page-layout: article
+---
+
+## 🎯 El Problema de Negocio
+
+Beta Bank está perdiendo clientes mes a mes. Adquirir un cliente nuevo es mucho más costoso que retener al que ya se tiene. El desafío: **identificar de forma proactiva** a los usuarios con alta probabilidad de cancelar sus cuentas para lanzar campañas de retención dirigidas.
+
+El reto técnico principal es el **fuerte desequilibrio de clases**: solo el ~20% de los clientes abandona el banco.
+
+## 📊 Los Datos
+
+Trabajamos con un dataset de **10,000 clientes** que incluye:
+
+- **Variables demográficas:** Edad, género, geografía.
+- **Variables financieras:** Puntuación crediticia, saldo, salario estimado.
+- **Variables de comportamiento:** Antigüedad (`Tenure`), número de productos, membresía activa.
+- **Variable objetivo:** `Exited` (1 = Abandonó, 0 = Se quedó).
+
+## 🧠 Enfoque y Metodología
+
+1. **Preprocesamiento:** Limpieza, imputación de nulos, *One-Hot Encoding* y escalado (`StandardScaler`).
+2. **División de datos:** 60% entrenamiento, 20% validación, 20% prueba (con estratificación).
+3. **Modelo Base:** Random Forest sin balanceo (F1 ≈ 0.55).
+4. **Balanceo de Clases:** Se probaron dos estrategias:
+   - `class_weight='balanced'` (F1 ≈ 0.55).
+   - **Sobremuestreo (Upsampling):** Multiplicar la clase minoritaria por 4.
+5. **Optimización:** Búsqueda de hiperparámetros (`n_estimators`, `max_depth`) para el modelo con upsampling.
+
+## 🏆 Resultados
+
+El enfoque de **Sobremuestreo + Ajuste de Hiperparámetros** fue el ganador indiscutible:
+
+| Modelo | F1-Score (Validación) | F1-Score (Prueba) | AUC-ROC |
+| :--- | ---: | ---: | ---: |
+| **Random Forest (Upsampling + Tuning)** | **0.6406** | **0.6257** | **0.8657** |
+| Random Forest (Class Weight) | 0.5522 | - | - |
+| Dummy (Clase mayoritaria) | 0.00 | - | 0.50 |
+
+- **F1-Score final:** **0.6257**, superando con creces el umbral exigido de 0.59.
+- **AUC-ROC:** **0.8657**, demostrando una excelente capacidad para discriminar entre desertores y clientes leales.
+
+## ✅ Recomendación de Negocio
+
+El modelo está listo para producción. Beta Bank puede integrarlo en su CRM para **priorizar las campañas de retención** únicamente en los clientes que el modelo marque como propensos a abandonar. Esto optimiza el presupuesto de marketing y aumenta la efectividad de las acciones de fidelización.
+
+## 🛠️ Stack Técnico
+
+::: {.grid}
+::: {.g-col-6 .g-col-md-3}
+**Lenguaje**
+
+Python
+:::
+::: {.g-col-6 .g-col-md-3}
+**Análisis**
+
+Pandas · NumPy
+:::
+::: {.g-col-6 .g-col-md-3}
+**ML**
+
+Scikit-learn (Random Forest, métricas)
+:::
+::: {.g-col-6 .g-col-md-3}
+**Visualización**
+
+Matplotlib · Seaborn
+:::
+:::
+
+## 🔗 Recursos
+
+- 📓 [Notebook completo con el análisis paso a paso](notebooks/analisis-beta-bank.ipynb){target="_blank"}
+- 💻 [Repositorio en GitHub](https://github.com/andagui-ds/beta-bank-churn-prediction){target="_blank"}

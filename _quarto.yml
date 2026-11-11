@@ -1,0 +1,26 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Beta Bank — Predicción de Churn"
+  description: "Modelo de clasificación para anticipar la fuga de clientes con técnicas de balanceo de clases."
+  repo-url: https://github.com/andagui-ds/beta-bank-churn-prediction
+  repo-actions: [edit, issue]
+  
+  page-footer:
+    left: |
+      © 2025 **Andrés Aguirre** · [Volver al portafolio](https://andagui-ds.github.io/portfolio/)
+    right: |
+      [GitHub](https://github.com/andagui-ds/beta-bank-churn-prediction)
+
+format:
+  html:
+    theme: [flatly, custom.scss]
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "🔍 Ver código Python"
+    fig-cap-location: bottom
+    tbl-cap-location: top
+    back-to-top-navigation: true
