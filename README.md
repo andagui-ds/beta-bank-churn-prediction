@@ -1,3 +1,10 @@
+---
+title: "Beta Bank: Predicción de Cancelación de Clientes"
+subtitle: "Clasificación con Random Forest y Manejo de Desbalance de Clases"
+description: "Modelo de Machine Learning para predecir si un cliente abandonará el banco, logrando un F1-score > 0.59 mediante técnicas de resampleo (Upsampling/Downsampling)."
+categories: [Machine Learning, Clasificación, Random Forest, Python]
+---
+
 # 🏦 Reducir el churn bancario: por qué accuracy miente y F1 no
 
 **Problema de negocio:** Beta Bank está perdiendo clientes mes a mes. El objetivo es construir un modelo predictivo capaz de identificar a los clientes con alta probabilidad de abandonar el banco, para priorizar campañas de retención. 
