@@ -16,7 +16,7 @@ website:
 
 format:
   html:
-    theme: [flatly, custom.scss]
+    theme: flatly
     toc: true
     toc-depth: 3
     code-fold: true
