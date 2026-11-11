@@ -1,44 +1,59 @@
----
-title: "Beta Bank: Predicción de Cancelación de Clientes"
-subtitle: "Clasificación con Random Forest y Manejo de Desbalance de Clases"
-description: "Modelo de Machine Learning para predecir si un cliente abandonará el banco, logrando un F1-score > 0.59 mediante técnicas de resampleo (Upsampling/Downsampling)."
-categories: [Machine Learning, Clasificación, Random Forest, Python]
----
+# 🏦 Beta Bank — Predicción de Abandono de Clientes (Churn)
 
-# 🏦 Reducir el churn bancario: por qué accuracy miente y F1 no
+> Modelo de clasificación de Machine Learning para anticipar la fuga de clientes, implementando técnicas avanzadas de balanceo de clases y optimización de hiperparámetros para superar el umbral de calidad exigido (F1-score > 0.59).
 
-**Problema de negocio:** Beta Bank está perdiendo clientes mes a mes. El objetivo es construir un modelo predictivo capaz de identificar a los clientes con alta probabilidad de abandonar el banco, para priorizar campañas de retención. 
+## 🎯 Problema de Negocio
 
-**El reto técnico:** El dataset está desbalanceado (aprox. 80% se queda, 20% se va). Por ello, la métrica de Accuracy es engañosa. El modelo fue optimizado para alcanzar un **F1-score mínimo de 0.59**, equilibrando Precision y Recall.
+Los clientes de **Beta Bank** están abandonando la institución mes a mes. Retener a un cliente existente es mucho más rentable que adquirir uno nuevo, por lo que el banco necesita identificar de manera proactiva a los usuarios con alta probabilidad de cancelar sus cuentas. 
 
----
+El desafío principal radica en el **fuerte desequilibrio de clases**: aproximadamente el 80% de los clientes se quedan (Clase 0) y solo el 20% se van (Clase 1). Un modelo tradicional tendería a predecir siempre "se queda", fallando en la identificación de los desertores.
 
-## 📊 Resultado principal
+## 📊 Datos
 
-- **F1-score final:** **0.6257** (superando el umbral exigido de 0.59) ✅
-- **AUC-ROC final:** **0.8657** (alta capacidad de discriminación)
-- **Técnica ganadora:** Sobremuestreo (Upsampling) de la clase minoritaria + Random Forest optimizado.
+- **Fuente:** `Churn.csv`
+- **Registros:** 10,000 clientes.
+- **Variables predictoras:** Puntuación crediticia, geografía, género, edad, antigüedad (`Tenure`), saldo, número de productos, posesión de tarjeta, membresía activa y salario estimado.
+- **Variable objetivo:** `Exited` (1 = Abandonó el banco, 0 = Se quedó).
 
----
+## 🧠 Enfoque y Solución
 
-## 🛠️ Metodología
+1. **Preprocesamiento:** 
+   - Eliminación de columnas no predictivas (`RowNumber`, `CustomerId`, `Surname`).
+   - Imputación de valores nulos en `Tenure` con la mediana.
+   - Codificación *One-Hot Encoding* para variables categóricas.
+   - Escalado de variables numéricas con `StandardScaler`.
+2. **División de datos:** Entrenamiento (60%), Validación (20%) y Prueba (20%), aplicando estratificación para mantener la proporción 80/20 en los tres conjuntos.
+3. **Modelo Base:** Random Forest sin balanceo, para establecer una línea base (F1 ≈ 0.55).
+4. **Manejo del Desbalanceo (Dos enfoques evaluados):**
+   - **Peso de clase:** `class_weight='balanced'` (F1 ≈ 0.55).
+   - **Sobremuestreo (Upsampling):** Multiplicar las observaciones de la clase minoritaria (desertores) por 4 en el conjunto de entrenamiento.
+5. **Optimización:** Búsqueda de hiperparámetros (`n_estimators` y `max_depth`) para el Random Forest entrenado con datos sobremuestreados, evaluado en el conjunto de validación.
 
-1. **Limpieza:** Imputación de nulos en `Tenure` (mediana), eliminación de columnas irrelevantes (`RowNumber`, `CustomerId`, `Surname`) y One-Hot Encoding para variables categóricas.
-2. **Preprocesamiento:** Estandarización de variables numéricas (`StandardScaler`) ajustado solo con el set de entrenamiento para evitar fuga de datos (data leakage).
-3. **Manejo del desbalance:** Se probaron dos enfoques: `class_weight='balanced'` y UpSampling de la clase 1. El UpSampling demostró mejor rendimiento.
-4. **Modelado:** Búsqueda de hiperparámetros (`n_estimators` y `max_depth`) para un clasificador Random Forest.
-5. **Evaluación:** Uso de validación cruzada (5-fold) para robustez y evaluación final en un set de prueba aislado (20%).
+## 🏆 Resultados y Rendimiento
 
----
+El enfoque de **Sobremuestreo + Ajuste de Hiperparámetros** demostró ser el más efectivo.
 
-## 📁 Contenido del repositorio
+| Modelo | F1-Score (Validación) | F1-Score (Prueba) | AUC-ROC (Prueba) |
+| :--- | ---: | ---: | ---: |
+| **Random Forest (Upsampling + Tuning)** | **0.6406** | **0.6257** | **0.8657** |
+| Random Forest (Class Weight) | 0.5522 | - | - |
+| Random Forest (Base) | 0.5556 | - | - |
+| Dummy (Clase mayoritaria) | 0.00 | - | 0.50 |
 
-- `notebooks/01-analisis-churn.ipynb`: Análisis completo, balanceo, modelado y matriz de confusión.
-- `requirements.txt`: Dependencias del proyecto.
-- `models/`: Almacena el modelo entrenado (`.joblib`) listo para producción.
+- **F1-Score:** El modelo final alcanzó un **0.6257**, superando con éxito el umbral mínimo exigido de 0.59.
+- **AUC-ROC:** Un valor de **0.8657** demuestra una excelente capacidad de discriminación; el modelo distingue a un desertor de un cliente leal mucho mejor que un clasificador aleatorio.
 
----
+## ✅ Recomendación de Negocio
 
+El modelo de Random Forest con sobremuestreo está listo para producción. Beta Bank puede utilizar estas predicciones para crear campañas de retención dirigidas (ofertas, llamadas de fidelización) únicamente a los usuarios que el modelo marque como propensos a abandonar, optimizando el presupuesto de marketing y reduciendo la tasa de churn.
+
+## 🛠️ Stack Técnico
+- **Lenguajes:** Python
+- **Librerías:** Pandas, Scikit-learn, Matplotlib, Seaborn
+- **Técnicas:** Random Forest, Upsampling, Clasificación, Optimización de hiperparámetros, Curva ROC.
+
+## 🔗 Ver el Análisis Completo
+- 📓 [Notebook original con todo el código paso a paso](notebooks/analisis-beta-bank.ipynb)
 ## ▶️ Cómo ejecutar
 
 ```bash
