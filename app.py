@@ -11,7 +11,7 @@ st.set_page_config(
     page_title="Beta Bank - Predicción de Churn", layout="wide"
 )
 
-# CSS compacto para que todo quepa en una sola vista sin scroll
+# CSS compacto para que tanto el panel principal como el sidebar quepan sin scroll
 st.markdown(
     """
     <style>
@@ -27,6 +27,13 @@ st.markdown(
             font-size: 1.12rem !important;
             margin-top: 0.35rem !important;
             margin-bottom: 0.35rem !important;
+        }
+        section[data-testid="stSidebar"] .block-container {
+            padding-top: 1rem;
+            padding-bottom: 0.5rem;
+        }
+        section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+            gap: 0.45rem;
         }
     </style>
     """,
@@ -106,26 +113,30 @@ def train_churn_model(df):
 
 model, feature_cols, test_f1, test_auc, feature_imp = train_churn_model(raw_df)
 
-# 3. Barra lateral: Perfil interactivo del cliente
-st.sidebar.header("Perfil del Cliente a Evaluar")
-geography = st.sidebar.selectbox("País (Geography)", ["France", "Germany", "Spain"])
-gender = st.sidebar.selectbox("Género (Gender)", ["Female", "Male"])
+# 3. Barra lateral: Perfil interactivo del cliente (compacto sin scroll)
+st.sidebar.subheader("Perfil del Cliente a Evaluar")
+
+c_s1, c_s2 = st.sidebar.columns(2)
+geography = c_s1.selectbox("País", ["France", "Germany", "Spain"])
+gender = c_s2.selectbox("Género", ["Female", "Male"])
+
 age = st.sidebar.slider("Edad (Age)", 18, 92, 42)
 balance = st.sidebar.number_input(
-    "Saldo en Cuenta (Balance USD)", 0.0, 250000.0, 85000.0, step=5000.0
+    "Saldo en Cuenta (USD)", 0.0, 250000.0, 85000.0, step=5000.0
 )
-credit_score = st.sidebar.slider("Puntaje Crediticio (CreditScore)", 350, 850, 650)
-tenure = st.sidebar.slider("Antigüedad en años (Tenure)", 0, 10, 5)
-num_products = st.sidebar.selectbox("Número de Productos", [1, 2, 3, 4], index=0)
-has_cr_card = st.sidebar.selectbox(
-    "¿Tiene Tarjeta de Crédito?", [1, 0], format_func=lambda x: "Sí" if x == 1 else "No"
-)
-is_active = st.sidebar.selectbox(
-    "¿Es Miembro Activo?", [1, 0], format_func=lambda x: "Sí" if x == 1 else "No"
-)
+credit_score = st.sidebar.slider("Puntaje Crediticio", 350, 850, 650)
+
+c_s3, c_s4 = st.sidebar.columns(2)
+tenure = c_s3.number_input("Antigüedad (años)", 0, 10, 5)
+num_products = c_s4.selectbox("Productos", [1, 2, 3, 4], index=0)
+
 est_salary = st.sidebar.number_input(
     "Salario Estimado (USD)", 10000.0, 200000.0, 100000.0, step=5000.0
 )
+
+c_s5, c_s6 = st.sidebar.columns(2)
+has_cr_card = 1 if c_s5.checkbox("Tarjeta Crédito", value=True) else 0
+is_active = 1 if c_s6.checkbox("Miembro Activo", value=True) else 0
 
 # Construir vector de entrada exacto para el modelo
 input_dict = {
@@ -181,7 +192,15 @@ with left_col:
       (raw_df["Geography"] == geography)
       & (raw_df["Age"] >= max(18, age - 5))
       & (raw_df["Age"] <= min(92, age + 5))
-  ][["Geography", "Gender", "Age", "Balance", "NumOfProducts", "IsActiveMember", "Exited"]]
+  ][[
+      "Geography",
+      "Gender",
+      "Age",
+      "Balance",
+      "NumOfProducts",
+      "IsActiveMember",
+      "Exited",
+  ]]
 
   st.dataframe(
       filtered_df.head(6), use_container_width=True, hide_index=True, height=225
