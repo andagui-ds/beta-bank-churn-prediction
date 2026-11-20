@@ -6,3 +6,4 @@ seaborn>=0.12
 joblib
 jupyter
 streamlit
+plotly
